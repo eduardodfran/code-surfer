@@ -53,5 +53,10 @@ export interface Rule {
 
 export interface AnalyzerOptions {
   enabledRules: string[]
-  language: 'javascript' | 'typescript' | 'javascriptreact' | 'typescriptreact'
+  language:
+    | 'javascript'
+    | 'typescript'
+    | 'javascriptreact'
+    | 'typescriptreact'
+    | 'python'
 }

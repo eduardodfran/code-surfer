@@ -23,10 +23,7 @@
     "code review"
   ],
   "activationEvents": [
-    "onLanguage:javascript",
-    "onLanguage:typescript",
-    "onLanguage:javascriptreact",
-    "onLanguage:typescriptreact"
+    "onStartupFinished"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -45,21 +42,35 @@
         "command": "code-surfer.refreshAnalysis",
         "title": "Refresh Analysis",
         "category": "Code Surfer"
+      },
+      {
+        "command": "code-surfer.openSettings",
+        "title": "Open Code Surfer Settings",
+        "category": "Code Surfer"
+      },
+      {
+        "command": "code-surfer.resetRuleConfig",
+        "title": "Reset Rule Configuration",
+        "category": "Code Surfer"
+      },
+      {
+        "command": "code-surfer.testPython",
+        "title": "Test Python Analysis (Debug)",
+        "category": "Code Surfer"
       }
     ],
     "views": {
       "explorer": [
         {
           "id": "codeSurferReport",
-          "name": "Code Surfer Report",
-          "when": "codeSurferEnabled"
+          "name": "Code Surfer Report"
         }
       ]
     },
     "viewsWelcome": [
       {
         "view": "codeSurferReport",
-        "contents": "🏄‍♂️ Welcome to Code Surfer!\n\nOpen a JavaScript or TypeScript file to see analysis results.\n\n[Analyze Current File](command:code-surfer.analyzeFile)"
+        "contents": "🏄‍♂️ Welcome to Code Surfer!\n\nOpen a JavaScript, TypeScript, or Python file to see analysis results.\n\n[Analyze Current File](command:code-surfer.analyzeFile)\n[Open Settings](command:code-surfer.openSettings)"
       }
     ],
     "configuration": {
@@ -84,6 +95,80 @@
           "type": "boolean",
           "default": true,
           "description": "Show inline hints and decorations in the editor"
+        },
+        "codeSurfer.rules.javascript": {
+          "type": "object",
+          "default": {
+            "unused-variable": {
+              "enabled": true,
+              "severity": "warning"
+            },
+            "async-without-await": {
+              "enabled": true,
+              "severity": "warning"
+            },
+            "long-function": {
+              "enabled": true,
+              "severity": "info",
+              "maxLines": 50
+            }
+          },
+          "description": "Configuration for JavaScript/TypeScript rules"
+        },
+        "codeSurfer.rules.python": {
+          "type": "object",
+          "default": {
+            "missing-docstring": {
+              "enabled": true,
+              "severity": "info"
+            },
+            "unused-variable": {
+              "enabled": true,
+              "severity": "info"
+            },
+            "bare-except": {
+              "enabled": true,
+              "severity": "warning"
+            },
+            "mutable-default-argument": {
+              "enabled": true,
+              "severity": "warning"
+            },
+            "comparison-with-singleton": {
+              "enabled": true,
+              "severity": "info"
+            },
+            "old-string-formatting": {
+              "enabled": true,
+              "severity": "info"
+            },
+            "long-function": {
+              "enabled": true,
+              "severity": "warning",
+              "maxLines": 50
+            },
+            "high-complexity": {
+              "enabled": true,
+              "severity": "warning",
+              "maxComplexity": 10
+            }
+          },
+          "description": "Configuration for Python rules"
+        },
+        "codeSurfer.severity.info": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show informational issues"
+        },
+        "codeSurfer.severity.warning": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show warning issues"
+        },
+        "codeSurfer.severity.error": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show error issues"
         }
       }
     }
@@ -119,6 +204,7 @@
     "@babel/parser": "^7.28.4",
     "@babel/traverse": "^7.28.4",
     "@babel/types": "^7.28.4",
-    "@typescript-eslint/utils": "^8.44.0"
+    "@typescript-eslint/utils": "^8.44.0",
+    "child_process": "^1.0.2"
   }
 }

@@ -43,12 +43,21 @@ export class CodeSurferReportProvider implements vscode.WebviewViewProvider {
    * Update the webview with a new analysis report
    */
   public updateReport(report: AnalysisReport): void {
+    console.log('📊 ReportProvider.updateReport called')
+    console.log('📄 Report file:', report.filePath)
+    console.log('🔢 Report results count:', report.results.length)
+    console.log('🌐 Webview available:', !!this._view)
+
     this._currentReport = report
     if (this._view) {
+      console.log('📤 Posting message to webview...')
       this._view.webview.postMessage({
         type: 'updateReport',
         report: report,
       })
+      console.log('✅ Message posted to webview')
+    } else {
+      console.log('⚠️ No webview available to update')
     }
   }
 
@@ -194,17 +203,38 @@ export class CodeSurferReportProvider implements vscode.WebviewViewProvider {
             color: var(--vscode-descriptionForeground);
             margin-bottom: 10px;
         }
+        
+        #fileName {
+            font-weight: bold;
+            color: var(--vscode-foreground);
+            margin-bottom: 4px;
+        }
+        
+        #languageInfo {
+            font-weight: 500;
+            color: var(--vscode-textLink-foreground);
+            margin-bottom: 2px;
+        }
+        
+        #analysisStats {
+            font-size: 0.8em;
+            opacity: 0.8;
+        }
     </style>
 </head>
 <body>
     <div class="header">
         <h3>🏄‍♂️ Code Surfer Report</h3>
-        <div class="file-info" id="fileInfo">No file analyzed</div>
+        <div class="file-info" id="fileInfo">
+            <div id="fileName">No file analyzed</div>
+            <div id="languageInfo"></div>
+            <div id="analysisStats"></div>
+        </div>
     </div>
     
     <div id="content">
         <div class="no-issues">
-            📄 Open a JavaScript or TypeScript file to see analysis results
+            📄 Open a JavaScript, TypeScript, or Python file to see analysis results
         </div>
     </div>
 
@@ -225,11 +255,27 @@ export class CodeSurferReportProvider implements vscode.WebviewViewProvider {
         });
         
         function updateReport(report) {
-            const fileInfo = document.getElementById('fileInfo');
+            const fileNameEl = document.getElementById('fileName');
+            const languageInfoEl = document.getElementById('languageInfo');
+            const analysisStatsEl = document.getElementById('analysisStats');
             const content = document.getElementById('content');
             
             const fileName = report.filePath.split(/[\\\\/]/).pop();
-            fileInfo.textContent = \`\${fileName} - \${report.results.length} issue(s) found\`;
+            fileNameEl.textContent = fileName;
+            
+            // Show language with appropriate icon
+            const languageIcons = {
+                'javascript': '📜 JavaScript',
+                'typescript': '📘 TypeScript', 
+                'javascriptreact': '⚛️ React (JS)',
+                'typescriptreact': '⚛️ React (TS)',
+                'python': '🐍 Python'
+            };
+            languageInfoEl.textContent = languageIcons[report.language] || \`📄 \${report.language}\`;
+            
+            // Show analysis statistics
+            const stats = \`\${report.results.length} issue(s) found • Analyzed \${new Date(report.timestamp).toLocaleTimeString()}\`;
+            analysisStatsEl.textContent = stats;
             
             if (report.results.length === 0) {
                 content.innerHTML = '<div class="no-issues">✅ No issues found! Your code looks great.</div>';
