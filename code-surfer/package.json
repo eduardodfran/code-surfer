@@ -1,0 +1,124 @@
+{
+  "name": "code-surfer",
+  "displayName": "Code Surfer",
+  "description": "A friendly peer reviewer that predicts potential issues in your code before they break things",
+  "version": "0.0.1",
+  "publisher": "code-surfer",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/code-surfer.git"
+  },
+  "engines": {
+    "vscode": "^1.104.0"
+  },
+  "categories": [
+    "Linters",
+    "Other"
+  ],
+  "keywords": [
+    "code analysis",
+    "static analysis",
+    "code quality",
+    "linter",
+    "code review"
+  ],
+  "activationEvents": [
+    "onLanguage:javascript",
+    "onLanguage:typescript",
+    "onLanguage:javascriptreact",
+    "onLanguage:typescriptreact"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "code-surfer.analyzeFile",
+        "title": "Analyze Current File",
+        "category": "Code Surfer"
+      },
+      {
+        "command": "code-surfer.showReport",
+        "title": "Show Code Surfer Report",
+        "category": "Code Surfer"
+      },
+      {
+        "command": "code-surfer.refreshAnalysis",
+        "title": "Refresh Analysis",
+        "category": "Code Surfer"
+      }
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "codeSurferReport",
+          "name": "Code Surfer Report",
+          "when": "codeSurferEnabled"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "codeSurferReport",
+        "contents": "🏄‍♂️ Welcome to Code Surfer!\n\nOpen a JavaScript or TypeScript file to see analysis results.\n\n[Analyze Current File](command:code-surfer.analyzeFile)"
+      }
+    ],
+    "configuration": {
+      "title": "Code Surfer",
+      "properties": {
+        "codeSurfer.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable/disable Code Surfer analysis"
+        },
+        "codeSurfer.analyzeOnSave": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically analyze files when saved"
+        },
+        "codeSurfer.analyzeOnOpen": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically analyze files when opened"
+        },
+        "codeSurfer.showInlineHints": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show inline hints and decorations in the editor"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/babel__traverse": "^7.28.0",
+    "@types/babel-traverse": "^6.25.10",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "@types/vscode": "^1.104.0",
+    "@typescript-eslint/eslint-plugin": "^8.42.0",
+    "@typescript-eslint/parser": "^8.44.0",
+    "@vscode/test-cli": "^0.0.11",
+    "@vscode/test-electron": "^2.5.2",
+    "eslint": "^9.34.0",
+    "ts-loader": "^9.5.4",
+    "typescript": "^5.9.2",
+    "webpack": "^5.101.3",
+    "webpack-cli": "^6.0.1"
+  },
+  "dependencies": {
+    "@babel/parser": "^7.28.4",
+    "@babel/traverse": "^7.28.4",
+    "@babel/types": "^7.28.4",
+    "@typescript-eslint/utils": "^8.44.0"
+  }
+}
