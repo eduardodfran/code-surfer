@@ -2,6 +2,7 @@ import { AnalysisEngine } from '../analysisEngine'
 import { UnusedVariableRule } from './unusedVariableRule'
 import { AsyncWithoutAwaitRule } from './asyncWithoutAwaitRule'
 import { LongFunctionRule } from './longFunctionRule'
+import { EslintSuggestionRule } from './eslintSuggestionRule'
 
 /**
  * Registry for all analysis rules
@@ -12,9 +13,15 @@ export class RuleRegistry {
     engine.registerRule(new UnusedVariableRule(engine))
     engine.registerRule(new AsyncWithoutAwaitRule(engine))
     engine.registerRule(new LongFunctionRule(engine))
+    engine.registerRule(new EslintSuggestionRule(engine))
   }
 
   static getDefaultEnabledRules(): string[] {
-    return ['unused-variable', 'async-without-await', 'long-function']
+    return [
+      'unused-variable',
+      'async-without-await',
+      'long-function',
+      'eslint-suggestions',
+    ]
   }
 }

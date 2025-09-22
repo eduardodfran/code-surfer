@@ -111,6 +111,10 @@
               "enabled": true,
               "severity": "info",
               "maxLines": 50
+            },
+            "eslint-suggestions": {
+              "enabled": true,
+              "severity": "info"
             }
           },
           "description": "Configuration for JavaScript/TypeScript rules"

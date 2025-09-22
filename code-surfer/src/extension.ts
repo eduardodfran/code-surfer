@@ -4,6 +4,7 @@ import { RuleRegistry } from './rules/ruleRegistry'
 import { CodeSurferReportProvider } from './webview/reportProvider'
 import { DecorationManager } from './decorations/decorationManager'
 import { ConfigurationManager } from './config/configurationManager'
+import { CodeActionProvider } from './codeActions/codeActionProvider'
 import { AnalysisReport, AnalyzerOptions } from './types'
 
 /**
@@ -14,6 +15,7 @@ export class CodeSurferExtension {
   private reportProvider: CodeSurferReportProvider
   private decorationManager: DecorationManager
   private configManager: ConfigurationManager
+  private codeActionProvider: CodeActionProvider
   private currentAnalysis = new Map<string, AnalysisReport>()
 
   constructor(private context: vscode.ExtensionContext) {
@@ -24,6 +26,7 @@ export class CodeSurferExtension {
     this.reportProvider = new CodeSurferReportProvider(context.extensionUri)
     this.decorationManager = DecorationManager.getInstance()
     this.configManager = new ConfigurationManager()
+    this.codeActionProvider = new CodeActionProvider()
 
     // Register all available rules
     RuleRegistry.registerAllRules(this.analysisEngine)
@@ -35,6 +38,7 @@ export class CodeSurferExtension {
     this.setupCommands()
     this.setupEventListeners()
     this.setupWebviewProvider()
+    this.setupCodeActionProvider()
 
     // Set context for view visibility
     vscode.commands.executeCommand('setContext', 'codeSurferEnabled', true)
@@ -114,6 +118,7 @@ export class CodeSurferExtension {
         const uri = document.uri.toString()
         this.currentAnalysis.delete(uri)
         this.decorationManager.clearDocumentDecorations(uri)
+        this.codeActionProvider.clearResults(uri)
       })
     )
   }
@@ -135,6 +140,28 @@ export class CodeSurferExtension {
       )
     )
     console.log('✅ Webview provider registered')
+  }
+
+  private setupCodeActionProvider(): void {
+    console.log('🔧 Registering Code Action Provider')
+
+    // Register for JavaScript and TypeScript files
+    const selector: vscode.DocumentSelector = [
+      { scheme: 'file', language: 'javascript' },
+      { scheme: 'file', language: 'typescript' },
+      { scheme: 'file', language: 'javascriptreact' },
+      { scheme: 'file', language: 'typescriptreact' },
+    ]
+
+    this.context.subscriptions.push(
+      vscode.languages.registerCodeActionsProvider(
+        selector,
+        this.codeActionProvider,
+        {
+          providedCodeActionKinds: [vscode.CodeActionKind.QuickFix],
+        }
+      )
+    )
   }
 
   private shouldAnalyzeFile(document: vscode.TextDocument): boolean {
@@ -217,6 +244,10 @@ export class CodeSurferExtension {
         if (editor) {
           console.log('🎨 Applying decorations...')
           this.decorationManager.applyDecorations(editor, report.results)
+
+          // Update code action provider with the new results
+          console.log('💡 Updating code actions...')
+          this.codeActionProvider.updateResults(editor.document, report.results)
         }
       }
 

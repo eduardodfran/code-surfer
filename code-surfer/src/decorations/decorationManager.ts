@@ -1,5 +1,5 @@
 import * as vscode from 'vscode'
-import { AnalysisResult, IssueSeverity } from '../types'
+import { AnalysisResult, IssueSeverity, IssueCategory } from '../types'
 
 /**
  * Manages editor decorations for Code Surfer analysis results
@@ -151,14 +151,28 @@ export class DecorationManager {
         hoverMessage.appendMarkdown(
           `💡 **Suggestion:** ${result.suggestion}\n\n`
         )
+        hoverMessage.appendMarkdown(`_Use Ctrl+. (Cmd+.) for quick fixes_\n\n`)
       }
 
       hoverMessage.appendMarkdown(`*Rule: ${result.ruleId}*`)
 
-      return {
+      const decoration: vscode.DecorationOptions = {
         range,
         hoverMessage,
       }
+
+      // Add a light bulb gutter icon for suggestions
+      if (result.suggestion && result.category === IssueCategory.SUGGESTION) {
+        decoration.renderOptions = {
+          before: {
+            contentText: '💡',
+            margin: '0 0.2em 0 0',
+            textDecoration: 'none; opacity: 0.7;',
+          },
+        }
+      }
+
+      return decoration
     })
   }
 
